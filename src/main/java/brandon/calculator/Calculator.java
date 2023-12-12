@@ -3,25 +3,16 @@ package brandon.calculator;
 import brandon.universal.util.ColorUtil;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-import javax.swing.plaf.basic.BasicScrollBarUI;
-import javax.swing.plaf.metal.MetalScrollBarUI;
-import javax.swing.plaf.synth.SynthScrollBarUI;
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.sun.java.accessibility.util.AWTEventMonitor.addKeyListener;
-
 public class Calculator {
 
-    public static final Color WHITE = ColorUtil.hex("#ffffff");
+    public static final Color WHITE = ColorUtil.hex("#ededed");
     public static final Color ORANGE = ColorUtil.hex("#d17d00");
     public static final Color GREY = ColorUtil.hex("#636262");
     public static final Color DARK_GREY = ColorUtil.hex("#3d3d3d");
@@ -32,7 +23,7 @@ public class Calculator {
     private static final Map<String, String> aliases = Map.of(
         "*", "x"
     );
-    private static CalculatorButtonAction calculatorButtonAction;
+    private static Display display;
 
 
     public static void main(String[] args) {
@@ -43,28 +34,25 @@ public class Calculator {
             frame.setBackground(DARK_GREY);
             frame.setResizable(false);
 
+
             // NUM PAD FUNCTIONALITY
             KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventPostProcessor(e -> {
                 keyPressed(e);
                 return false;
             });
 
+
             // MAIN PANEL
             JPanel mainPanel = new JPanel();
             mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
             mainPanel.setBorder(null);
+            mainPanel.setOpaque(true);
             mainPanel.setBackground(VERY_DARK_GREY);
             mainPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
 
 
-            JScrollPane scrollPane = new JScrollPane();
-            scrollPane.setOpaque(false);
-//            scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-            scrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
-            scrollPane.setPreferredSize(new Dimension(200, 400));
-            //motif, synth
-
-            calculatorButtonAction = new CalculatorButtonAction(scrollPane);
+            display = new Display(mainPanel);
+            JScrollPane scrollPane = display.init();
 
 
             // BUTTON GRID
@@ -159,7 +147,7 @@ public class Calculator {
         rowPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
         for (int i = 0; i < labels.length; i++) {
             JButton button = new JButton(labels[i]);
-            button.addActionListener(new CalculatorButtonAction(scrollPane));
+            button.addActionListener(display);
             button.setBorder(new LineBorder(VERY_DARK_GREY, 1));
             button.setContentAreaFilled(false);
             button.setBackground(colors[i]);
